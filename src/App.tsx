@@ -32,7 +32,7 @@ function App() {
   const [approvedLoanAmount, setApprovedLoanAmount] = useState(1000000)
   const [loanRate, setLoanRate] = useState(6.05)
   const [minLvr, setMinLvr] = useState(0.95)
-  const [loanTermYears, setLoanTermYears] = useState(30)
+  const [loanTermYears] = useState(30)
 
   // Property inputs
   const [propertyValue, setPropertyValue] = useLocalStorage<number>('propertyValue', 700000)
