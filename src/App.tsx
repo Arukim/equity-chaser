@@ -1,121 +1,161 @@
-import { useState } from 'react'
-import reactLogo from './assets/react.svg'
-import viteLogo from './assets/vite.svg'
-import heroImg from './assets/hero.png'
+import { useState, useMemo } from 'react'
 import './App.css'
 
 function App() {
-  const [count, setCount] = useState(0)
+  // Loan inputs (approved loan amount)
+  const [approvedLoanAmount, setApprovedLoanAmount] = useState(1400000)
+  const [loanRate, setLoanRate] = useState(6.05)
+  const [loanTermYears, setLoanTermYears] = useState(30)
+
+  // Property inputs
+  const [propertyValue, setPropertyValue] = useState(1400000)
+  const [deposit, setDeposit] = useState(150000)
+
+  // Calculate actual loan amount (what you're borrowing based on property and deposit)
+  const actualLoanAmount = propertyValue - deposit
+
+  // Currency formatter for AUD
+  const formatCurrency = (amount: number) => {
+    return new Intl.NumberFormat('en-AU', {
+      style: 'currency',
+      currency: 'AUD',
+      minimumFractionDigits: 0,
+      maximumFractionDigits: 0,
+    }).format(amount)
+  }
+
+  // Calculate monthly repayment
+  const monthlyRepayment = useMemo(() => {
+    const principal = approvedLoanAmount
+    const annualRate = loanRate
+    const monthlyRate = annualRate / 100 / 12
+    const totalPayments = loanTermYears * 12
+
+    if (monthlyRate === 0) {
+      return principal / totalPayments
+    }
+
+    return (
+      (principal * monthlyRate * Math.pow(1 + monthlyRate, totalPayments)) /
+      (Math.pow(1 + monthlyRate, totalPayments) - 1)
+    )
+  }, [approvedLoanAmount, loanRate, loanTermYears])
+
+  // Calculate total repayments and overpayment
+  const repaymentSummary = useMemo(() => {
+    const totalPayments = monthlyRepayment * loanTermYears * 12
+    const totalInterest = totalPayments - actualLoanAmount
+    return { totalPayments, totalInterest }
+  }, [monthlyRepayment, loanTermYears, actualLoanAmount])
+
+  // Calculate LVR using approved loan amount
+  const lvr = useMemo(() => {
+    return (actualLoanAmount / propertyValue) * 100
+  }, [actualLoanAmount, propertyValue])
 
   return (
-    <>
+    <div className="container">
       <section id="center">
         <div className="hero">
-          <img src={heroImg} className="base" width="170" height="179" alt="" />
-          <img src={reactLogo} className="framework" alt="React logo" />
-          <img src={viteLogo} className="vite" alt="Vite logo" />
+          <h1>Mortgage Calculator</h1>
+          <p>Calculate your repayments and overpayment</p>
         </div>
-        <div>
-          <h1>Get started</h1>
-          <p>
-            Edit <code>src/App.tsx</code> and save to test <code>HMR</code>
-          </p>
-        </div>
-        <button
-          type="button"
-          className="counter"
-          onClick={() => setCount((count) => count + 1)}
-        >
-          Count is {count}
-        </button>
-      </section>
 
-      <div className="ticks"></div>
+        <div className="inputs-row">
+          {/* Loan Details Section */}
+          <div className="inputs-section">
+            <h2>Loan Details</h2>
+            <div className="input-group">
+              <label htmlFor="loan-amount">Loan Amount</label>
+              <input
+                id="loan-amount"
+                type="number"
+                value={approvedLoanAmount}
+                onChange={(e) => setApprovedLoanAmount(Number(e.target.value))}
+                placeholder="Enter loan amount"
+              />
+            </div>
 
-      <section id="next-steps">
-        <div id="docs">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#documentation-icon"></use>
-          </svg>
-          <h2>Documentation</h2>
-          <p>Your questions, answered</p>
-          <ul>
-            <li>
-              <a href="https://vite.dev/" target="_blank">
-                <img className="logo" src={viteLogo} alt="" />
-                Explore Vite
-              </a>
-            </li>
-            <li>
-              <a href="https://react.dev/" target="_blank">
-                <img className="button-icon" src={reactLogo} alt="" />
-                Learn more
-              </a>
-            </li>
-          </ul>
+            <div className="input-group">
+              <label htmlFor="loan-rate">Interest Rate (%)</label>
+              <input
+                id="loan-rate"
+                type="number"
+                value={loanRate}
+                onChange={(e) => setLoanRate(Number(e.target.value))}
+                placeholder="Enter interest rate"
+                step="0.01"
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="loan-term">Loan Term (Years)</label>
+              <input
+                id="loan-term"
+                type="number"
+                value={loanTermYears}
+                onChange={(e) => setLoanTermYears(Number(e.target.value))}
+                placeholder="Enter loan term"
+              />
+            </div>
+          </div>
+
+          {/* Property Details Section */}
+          <div className="inputs-section">
+            <h2>Property Details</h2>
+            <div className="input-group">
+              <label htmlFor="property-value">Property Value</label>
+              <input
+                id="property-value"
+                type="number"
+                value={propertyValue}
+                onChange={(e) => setPropertyValue(Number(e.target.value))}
+                placeholder="Enter property value"
+              />
+            </div>
+
+            <div className="input-group">
+              <label htmlFor="deposit">Deposit</label>
+              <input
+                id="deposit"
+                type="number"
+                value={deposit}
+                onChange={(e) => setDeposit(Number(e.target.value))}
+                placeholder="Enter deposit amount"
+              />
+            </div>
+          </div>
         </div>
-        <div id="social">
-          <svg className="icon" role="presentation" aria-hidden="true">
-            <use href="/icons.svg#social-icon"></use>
-          </svg>
-          <h2>Connect with us</h2>
-          <p>Join the Vite community</p>
-          <ul>
-            <li>
-              <a href="https://github.com/vitejs/vite" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#github-icon"></use>
-                </svg>
-                GitHub
-              </a>
-            </li>
-            <li>
-              <a href="https://chat.vite.dev/" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#discord-icon"></use>
-                </svg>
-                Discord
-              </a>
-            </li>
-            <li>
-              <a href="https://x.com/vite_js" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#x-icon"></use>
-                </svg>
-                X.com
-              </a>
-            </li>
-            <li>
-              <a href="https://bsky.app/profile/vite.dev" target="_blank">
-                <svg
-                  className="button-icon"
-                  role="presentation"
-                  aria-hidden="true"
-                >
-                  <use href="/icons.svg#bluesky-icon"></use>
-                </svg>
-                Bluesky
-              </a>
-            </li>
-          </ul>
+
+        {/* Results Section */}
+        <div className="results-section">
+          <h2>Results</h2>
+          <div className="result-item">
+            <span className="label">Monthly Repayment:</span>
+            <span className="value">{formatCurrency(monthlyRepayment)}</span>
+          </div>
+          <div className="result-item">
+            <span className="label">Total Repayments:</span>
+            <span className="value">{formatCurrency(repaymentSummary.totalPayments)}</span>
+          </div>
+          <div className="result-item">
+            <span className="label">Total Interest (Overpayment):</span>
+            <span className="value">{formatCurrency(repaymentSummary.totalInterest)}</span>
+          </div>
+          <div className="result-item">
+            <span className="label">Loan-to-Value Ratio (LVR):</span>
+            <span className="value">{lvr.toFixed(2)}%</span>
+          </div>
+          <div className="result-item">
+            <span className="label">Equity Available:</span>
+            <span className="value">{formatCurrency(propertyValue - actualLoanAmount)}</span>
+          </div>
         </div>
       </section>
 
       <div className="ticks"></div>
       <section id="spacer"></section>
-    </>
+    </div>
   )
 }
 
