@@ -1,11 +1,23 @@
 import type {
-  PropertyType, AreaSize, BuildingAge, SuburbArea,
+  PropertyType, AreaSize, BuildingAge, SuburbArea, LocationPrestige,
   SpendingItem, GrowthRates, OptionEntry,
 } from './types'
 
 // ─── Constants ────────────────────────────────────────────────────────────────
 
 export const USABLE_EQUITY_LVR = 0.80
+
+// New Build Depreciation: properties marked as "New" suffer temporary capital depreciation
+export const NEW_BUILD_DEPRECIATION_RATE = -2.0 // % p.a. drag during first 36 months
+export const NEW_BUILD_PENALTY_MONTHS = 36 // Number of months to apply the penalty
+
+// Micro-Location Prestige Modifier: adjusts baseline suburb growth rate
+export const PRESTIGE_MODIFIER: Record<LocationPrestige, number> = {
+  ghetto: -0.75,
+  mediocre: -0.3,
+  norm: 0,
+  premium: 1.0,
+}
 
 // ─── Suburb Presets ───────────────────────────────────────────────────────────
 // To add a new suburb: append one object here. Zero tsx changes required.
@@ -47,6 +59,13 @@ export const BUILDING_AGE_OPTIONS: OptionEntry[] = [
   { id: 'mid',     label: 'Mid 10–20yr' },
   { id: 'mature',  label: 'Mature 20–30yr' },
   { id: 'old',     label: 'Old 30yr+' },
+]
+
+export const PRESTIGE_OPTIONS: OptionEntry[] = [
+  { id: 'ghetto',   label: 'Newly built ghetto' },
+  { id: 'mediocre', label: 'Mediocre location' },
+  { id: 'norm',     label: 'Norm' },
+  { id: 'premium',  label: 'Premium' },
 ]
 
 // ─── Spending Catalogues ──────────────────────────────────────────────────────
@@ -105,15 +124,19 @@ const AGE_MODIFIER: Record<BuildingAge, number> = {
 
 /**
  * Returns low/mid/high annual growth rate percentages combining the suburb
- * baseline with property type and building age modifiers.
+ * baseline with property type, building age, and location prestige modifiers.
  */
 export function getGrowthRates(
   suburbArea: SuburbArea,
   propertyType: PropertyType,
   buildingAge: BuildingAge,
+  locationPrestige?: LocationPrestige,
 ): GrowthRates {
   const base = SUBURB_PRESETS.find((p) => p.id === suburbArea)!.growthRates
-  const modifier = TYPE_MODIFIER[propertyType] + AGE_MODIFIER[buildingAge]
+  const modifier =
+    TYPE_MODIFIER[propertyType] +
+    AGE_MODIFIER[buildingAge] +
+    (locationPrestige ? PRESTIGE_MODIFIER[locationPrestige] : 0)
   return { low: base.low + modifier, mid: base.mid + modifier, high: base.high + modifier }
 }
 

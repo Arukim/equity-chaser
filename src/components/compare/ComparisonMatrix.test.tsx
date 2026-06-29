@@ -14,8 +14,8 @@ function makeScenario(id: string, name: string): SavedScenario {
     inputs: {
       approvedLoanAmount: 1_000_000, loanRate: 6.05, minLvr: 0.80,
       loanTermYears: 30, propertyValue: 800_000, depositRequired: 0.20,
-      savings: 200_000, monthlyBudget: 6_000, isFirstHomeBuyer: false,
-      propertyType: 'apartment', areaSize: 'medium', buildingAge: 'recent',
+      savings: 200_000, monthlyBudget: 6_000, wageGrowthRate: 1.5, isFirstHomeBuyer: false,
+      propertyType: 'apartment', areaSize: 'medium', buildingAge: 'recent', locationPrestige: 'norm',
       suburbArea: 'hills', enabledSpendingIds: [], customSpendings: [],
       growthRateOverride: 5.0, currentRent: 0, renovationMonths: 0, cpiRate: 3.5, spendingMonths: {},
     },
@@ -31,6 +31,7 @@ function makeMetrics(overrides: Partial<ComputedScenarioMetrics> = {}): Computed
     year10: { propertyValue: 1_300_000, loanBalance: 530_000, netEquity: 520_000, usableEquity: 510_000 },
     totalInterestPaid: 380_000, totalHoldingCosts: 95_000, totalSunkCosts: 475_000,
     usableEquityTrajectory: Array(120).fill(100_000) as number[],
+    totalEquityTrajectory: Array(120).fill(200_000) as number[],
     ...overrides,
   }
 }

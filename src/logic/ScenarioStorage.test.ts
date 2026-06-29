@@ -21,8 +21,8 @@ vi.stubGlobal('localStorage', localStorageMock)
 const INPUTS: ScenarioInputs = {
   approvedLoanAmount: 1000000, loanRate: 6.05, minLvr: 0.95,
   loanTermYears: 30, propertyValue: 700000, depositRequired: 0.05,
-  savings: 50000, monthlyBudget: 5000, isFirstHomeBuyer: true,
-  propertyType: 'apartment', areaSize: 'medium', buildingAge: 'recent',
+  savings: 50000, monthlyBudget: 5000, wageGrowthRate: 1.5, isFirstHomeBuyer: true,
+  propertyType: 'apartment', areaSize: 'medium', buildingAge: 'recent', locationPrestige: 'norm',
   suburbArea: 'hills', enabledSpendingIds: [], customSpendings: [],
   growthRateOverride: null, currentRent: 0, renovationMonths: 0, cpiRate: 3.5,
   spendingMonths: {},

@@ -1,5 +1,5 @@
 import { useState, useEffect, useMemo } from 'react'
-import type { ScenarioInputs, SpendingItem, PropertyType, AreaSize, BuildingAge, SuburbArea } from '../logic/types'
+import type { ScenarioInputs, SpendingItem, PropertyType, AreaSize, BuildingAge, LocationPrestige, SuburbArea } from '../logic/types'
 import { calculateNSWStampDuty } from '../logic/StampDuty'
 import { calculateMonthlyRepayment, calculateLVR, calculateOffsetBalance, calculateRepaymentSummary } from '../logic/LoanCalculator'
 import { getGrowthRates, getPresetSpendings, UPGRADE_CATALOGUE, VEHICLE_CATALOGUE, LIFESTYLE_CATALOGUE } from '../logic/PropertyPresets'
@@ -32,9 +32,11 @@ export function DashboardPage({ onInputsChange, loaded }: DashboardPageProps) {
   const [isFHB, setIsFHB]               = useLS<boolean>('isFirstHomeBuyer', true)
   const [savings, setSavings]           = useLS<number>('savings', 50000)
   const [budget, setBudget]             = useLS<number>('monthlyBudget', 5000)
+  const [wageGrowth, setWageGrowth]     = useLS<number>('wageGrowthRate', 1.5)
   const [propType, setPropType]         = useLS<PropertyType>('propertyType', 'apartment')
   const [areaSize, setAreaSize]         = useLS<AreaSize>('areaSize', 'medium')
   const [buildAge, setBuildAge]         = useLS<BuildingAge>('buildingAge', 'recent')
+  const [prestige, setPrestige]         = useLS<LocationPrestige>('locationPrestige', 'norm')
   const [suburb, setSuburb]             = useLS<SuburbArea>('suburbArea', 'hills')
   const [enabledIds, setEnabledIds]     = useLS<string[]>('enabledSpendingIds', [])
   const [customItems, setCustomItems]   = useLS<SpendingItem[]>('customSpendings', [])
@@ -67,15 +69,15 @@ export function DashboardPage({ onInputsChange, loaded }: DashboardPageProps) {
   const growthRates = useMemo(() =>
     growthOverride !== null
       ? { low: growthOverride, mid: growthOverride, high: growthOverride }
-      : getGrowthRates(suburb, propType, buildAge),
-  [suburb, propType, buildAge, growthOverride])
+      : getGrowthRates(suburb, propType, buildAge, prestige),
+  [suburb, propType, buildAge, prestige, growthOverride])
 
   const forecast = useMemo(() => calculateEquityForecast({
     propertyValue, loanAmount: loan, annualRate: loanRate,
     initialOffsetBalance: offset, monthlyRepayment: repayment, monthlyBudget: budget,
-    ongoingItems: ongoing, oneOffItems: oneOffs, growthRates,
-    cpiRate: cpi, currentRent: rent, renovationMonths: renoMo,
-  }), [propertyValue, loan, loanRate, offset, repayment, budget, ongoing, oneOffs, growthRates, cpi, rent, renoMo])
+    wageGrowthRate: wageGrowth, ongoingItems: ongoing, oneOffItems: oneOffs, growthRates,
+    cpiRate: cpi, currentRent: rent, renovationMonths: renoMo, isNewBuild: buildAge === 'new',
+  }), [propertyValue, loan, loanRate, offset, repayment, budget, wageGrowth, ongoing, oneOffs, growthRates, cpi, rent, renoMo, buildAge])
 
   const warnings = useMemo(() => calculateFinancialHealthWarnings({
     initialOffsetBalance: offset, monthlyRepayment: repayment,
@@ -93,9 +95,11 @@ export function DashboardPage({ onInputsChange, loaded }: DashboardPageProps) {
       isFirstHomeBuyer:   (v) => setIsFHB(v as boolean),
       savings:            (v) => setSavings(v as number),
       monthlyBudget:      (v) => setBudget(v as number),
+      wageGrowthRate:     (v) => setWageGrowth(v as number),
       propertyType:       (v) => setPropType(v as PropertyType),
       areaSize:           (v) => setAreaSize(v as AreaSize),
       buildingAge:        (v) => setBuildAge(v as BuildingAge),
+      locationPrestige:   (v) => setPrestige(v as LocationPrestige),
       suburbArea:         (v) => setSuburb(v as SuburbArea),
       currentRent:        (v) => setRent(v as number),
       renovationMonths:   (v) => setRenoMo(v as number),
@@ -121,8 +125,8 @@ export function DashboardPage({ onInputsChange, loaded }: DashboardPageProps) {
 
   const inputs: ScenarioInputs = {
     approvedLoanAmount, loanRate, minLvr, loanTermYears, propertyValue, depositRequired,
-    savings, monthlyBudget: budget, isFirstHomeBuyer: isFHB, propertyType: propType,
-    areaSize, buildingAge: buildAge, suburbArea: suburb, enabledSpendingIds: enabledIds,
+    savings, monthlyBudget: budget, wageGrowthRate: wageGrowth, isFirstHomeBuyer: isFHB, propertyType: propType,
+    areaSize, buildingAge: buildAge, locationPrestige: prestige, suburbArea: suburb, enabledSpendingIds: enabledIds,
     customSpendings: customItems, growthRateOverride: growthOverride,
     currentRent: rent, renovationMonths: renoMo, cpiRate: cpi,
     spendingMonths: execMonths,
@@ -135,7 +139,7 @@ export function DashboardPage({ onInputsChange, loaded }: DashboardPageProps) {
   // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [
     approvedLoanAmount, loanRate, minLvr, loanTermYears, propertyValue, depositRequired,
-    savings, budget, isFHB, propType, areaSize, buildAge, suburb,
+    savings, budget, wageGrowth, isFHB, propType, areaSize, buildAge, prestige, suburb,
     enabledIds, customItems, execMonths, growthOverride, rent, renoMo, cpi,
   ])
 
@@ -152,9 +156,11 @@ export function DashboardPage({ onInputsChange, loaded }: DashboardPageProps) {
     setIsFHB(i.isFirstHomeBuyer)
     setSavings(i.savings)
     setBudget(i.monthlyBudget)
+    setWageGrowth(i.wageGrowthRate)
     setPropType(i.propertyType)
     setAreaSize(i.areaSize)
     setBuildAge(i.buildingAge)
+    setPrestige(i.locationPrestige)
     setSuburb(i.suburbArea)
     setEnabledIds(i.enabledSpendingIds)
     setCustomItems(i.customSpendings)

@@ -38,18 +38,20 @@ export interface ForecastParams {
   initialOffsetBalance: number
   monthlyRepayment: number
   monthlyBudget: number
+  wageGrowthRate: number
   ongoingItems: SpendingItem[]
   oneOffItems: SpendingItem[]
   growthRates: GrowthRates
   cpiRate: number
   currentRent: number
   renovationMonths: number
+  isNewBuild: boolean
 }
 
 function runSimulation(params: ForecastParams, annualGrowthRate: number): { year5: EquitySnapshot; year10: EquitySnapshot } {
-  const { propertyValue, loanAmount, annualRate, initialOffsetBalance, monthlyRepayment, monthlyBudget, ongoingItems, oneOffItems, cpiRate, currentRent, renovationMonths } = params
+  const { propertyValue, loanAmount, annualRate, initialOffsetBalance, monthlyRepayment, monthlyBudget, wageGrowthRate, ongoingItems, oneOffItems, cpiRate, currentRent, renovationMonths, isNewBuild } = params
   const monthlyRate = annualRate / 100 / 12
-  const monthlyGrowthRate = annualGrowthRate / 100 / 12
+  let monthlyGrowthRate = annualGrowthRate / 100 / 12
   const baseMonthlyOngoing = ongoingItems.reduce((s, i) => s + toMonthlyAmount(i), 0)
   const oneOffSchedule = buildOneOffSchedule(oneOffItems)
 
@@ -75,8 +77,18 @@ function runSimulation(params: ForecastParams, annualGrowthRate: number): { year
     const interest = effective * monthlyRate
     const principal = Math.max(monthlyRepayment - interest, 0)
     loanBalance = Math.max(loanBalance - principal, 0)
-    offsetBalance += monthlyBudget - monthlyRepayment - ongoing
-    propValue *= (1 + monthlyGrowthRate)
+
+    // Annual Income Growth: compound the monthly budget each year
+    const effectiveMonthlyBudget = monthlyBudget * Math.pow(1 + wageGrowthRate / 100, yearIdx)
+    offsetBalance += effectiveMonthlyBudget - monthlyRepayment - ongoing
+
+    // Apply growth rate with new-build depreciation penalty for first 36 months
+    let effectiveGrowthRate = monthlyGrowthRate
+    if (isNewBuild && month <= 36) {
+      // New build depreciation drag: -2.0% p.a. during first 3 years
+      effectiveGrowthRate = monthlyGrowthRate - 0.02 / 12 // NEW_BUILD_DEPRECIATION_RATE / 100 / 12
+    }
+    propValue *= (1 + effectiveGrowthRate)
 
     if (month === 60 || month === 120) {
       const year = month / 12 as 5 | 10

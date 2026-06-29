@@ -9,8 +9,8 @@ import './App.css'
 const EMPTY_INPUTS: ScenarioInputs = {
   approvedLoanAmount: 0, loanRate: 0, minLvr: 0, loanTermYears: 30,
   propertyValue: 0, depositRequired: 0, savings: 0, monthlyBudget: 0,
-  isFirstHomeBuyer: false, propertyType: 'apartment', areaSize: 'medium',
-  buildingAge: 'recent', suburbArea: 'hills', enabledSpendingIds: [],
+  wageGrowthRate: 1.5, isFirstHomeBuyer: false, propertyType: 'apartment', areaSize: 'medium',
+  buildingAge: 'recent', locationPrestige: 'norm', suburbArea: 'hills', enabledSpendingIds: [],
   customSpendings: [], growthRateOverride: null, currentRent: 0,
   renovationMonths: 0, cpiRate: 3.5, spendingMonths: {},
 }

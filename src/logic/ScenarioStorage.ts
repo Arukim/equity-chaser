@@ -9,12 +9,14 @@ const CURRENT_SCHEMA_VERSION = 1 as const
  * Default values for fields added in schema v1.
  * When a new field is added in v2, add its default here and bump the version.
  */
-const V1_DEFAULTS: Pick<ScenarioInputs, 'cpiRate' | 'currentRent' | 'renovationMonths' | 'isFirstHomeBuyer' | 'spendingMonths'> = {
+const V1_DEFAULTS: Pick<ScenarioInputs, 'cpiRate' | 'currentRent' | 'renovationMonths' | 'isFirstHomeBuyer' | 'spendingMonths' | 'wageGrowthRate' | 'locationPrestige'> = {
   cpiRate: 3.5,
   currentRent: 0,
   renovationMonths: 0,
   isFirstHomeBuyer: false,
   spendingMonths: {},
+  wageGrowthRate: 1.5,
+  locationPrestige: 'norm',
 }
 
 /**

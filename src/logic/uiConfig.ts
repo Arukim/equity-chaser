@@ -1,7 +1,7 @@
 import type { SectionConfig } from './types'
 import {
   SUBURB_PRESETS, PROPERTY_TYPE_OPTIONS, AREA_SIZE_OPTIONS,
-  BUILDING_AGE_OPTIONS, UPGRADE_CATALOGUE, VEHICLE_CATALOGUE, LIFESTYLE_CATALOGUE,
+  BUILDING_AGE_OPTIONS, PRESTIGE_OPTIONS, UPGRADE_CATALOGUE, VEHICLE_CATALOGUE, LIFESTYLE_CATALOGUE,
 } from './PropertyPresets'
 
 /**
@@ -13,6 +13,7 @@ export const CONFIG_REGISTRY: Record<string, unknown[]> = {
   PROPERTY_TYPE_OPTIONS,
   AREA_SIZE_OPTIONS,
   BUILDING_AGE_OPTIONS,
+  PRESTIGE_OPTIONS,
   SUBURB_PRESETS,
   UPGRADE_CATALOGUE,
   VEHICLE_CATALOGUE,
@@ -49,6 +50,7 @@ export const FORM_SECTIONS: SectionConfig[] = [
     fields: [
       { id: 'savings',       label: 'Current Savings', control: 'currency' },
       { id: 'monthlyBudget', label: 'Monthly Budget',  control: 'currency' },
+      { id: 'wageGrowthRate', label: 'Annual Income Growth', control: 'percent', step: 0.1, min: 0, max: 15 },
     ],
   },
   {
@@ -58,6 +60,7 @@ export const FORM_SECTIONS: SectionConfig[] = [
       { id: 'propertyType', label: 'Type', control: 'chip-group', optionsKey: 'PROPERTY_TYPE_OPTIONS' },
       { id: 'areaSize',     label: 'Size', control: 'chip-group', optionsKey: 'AREA_SIZE_OPTIONS' },
       { id: 'buildingAge',  label: 'Age',  control: 'chip-group', optionsKey: 'BUILDING_AGE_OPTIONS' },
+      { id: 'locationPrestige', label: 'Prestige', control: 'chip-group', optionsKey: 'PRESTIGE_OPTIONS' },
       { id: 'suburbArea',   label: 'Area', control: 'chip-group', optionsKey: 'SUBURB_PRESETS' },
     ],
   },

@@ -3,6 +3,7 @@
 export type PropertyType = 'apartment' | 'duplex' | 'townhouse' | 'house'
 export type AreaSize = 'small' | 'medium' | 'large' | 'xlarge'
 export type BuildingAge = 'new' | 'recent' | 'mid' | 'mature' | 'old'
+export type LocationPrestige = 'ghetto' | 'mediocre' | 'norm' | 'premium'
 export type SuburbArea =
   | 'hills'
   | 'shire'
@@ -110,10 +111,12 @@ export interface ScenarioInputs {
   depositRequired: number
   savings: number
   monthlyBudget: number
+  wageGrowthRate: number
   isFirstHomeBuyer: boolean
   propertyType: PropertyType
   areaSize: AreaSize
   buildingAge: BuildingAge
+  locationPrestige: LocationPrestige
   suburbArea: SuburbArea
   enabledSpendingIds: string[]
   customSpendings: SpendingItem[]

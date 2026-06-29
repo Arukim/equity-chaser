@@ -151,6 +151,7 @@ export function computeScenarioComparison(
     inputs.suburbArea,
     inputs.propertyType,
     inputs.buildingAge,
+    inputs.locationPrestige,
   )
   const annualGrowthRate =
     inputs.growthRateOverride !== null ? inputs.growthRateOverride : growthRates.mid
@@ -228,8 +229,18 @@ export function computeScenarioComparison(
 
     const principal = Math.max(monthlyRepayment - interest, 0)
     loanBalance = Math.max(loanBalance - principal, 0)
-    offsetBalance += monthlyBudget - monthlyRepayment - ongoing
-    propValue *= 1 + monthlyGrowthRate
+    
+
+     // Annual Income Growth: compound the monthly budget each year
+     const effectiveMonthlyBudget = monthlyBudget * Math.pow(1 + inputs.wageGrowthRate / 100, yearIdx)
+     offsetBalance += effectiveMonthlyBudget - monthlyRepayment - ongoing
+
+     // Apply growth rate with new-build depreciation penalty for first 36 months
+     let effectiveGrowthRate = monthlyGrowthRate
+     if (inputs.buildingAge === 'new' && month <= 36) {
+       effectiveGrowthRate = monthlyGrowthRate - 0.02 / 12
+     }
+     propValue *= 1 + effectiveGrowthRate
 
     const usableEquity = propValue * USABLE_EQUITY_LVR - loanBalance
     usableEquityTrajectory.push(usableEquity)

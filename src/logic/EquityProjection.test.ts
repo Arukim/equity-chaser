@@ -6,9 +6,10 @@ const NO_ITEMS: SpendingItem[] = []
 const BASE = {
   propertyValue: 700000, loanAmount: 560000, annualRate: 6.0,
   initialOffsetBalance: 30000, monthlyRepayment: 3357, monthlyBudget: 5000,
+  wageGrowthRate: 1.5,
   ongoingItems: NO_ITEMS, oneOffItems: NO_ITEMS,
   growthRates: { low: 2.0, mid: 4.0, high: 7.0 },
-  cpiRate: 3.5, currentRent: 0, renovationMonths: 0,
+  cpiRate: 3.5, currentRent: 0, renovationMonths: 0, isNewBuild: false,
 }
 const mkMonthly = (amt: number): SpendingItem => ({
   id: 'c', label: 'C', category: 'other', frequency: 'monthly',

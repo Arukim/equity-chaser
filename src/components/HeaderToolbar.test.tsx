@@ -22,8 +22,8 @@ function makeInputs(overrides: Partial<ScenarioInputs> = {}): ScenarioInputs {
   return {
     approvedLoanAmount: 1_000_000, loanRate: 6.05, minLvr: 0.80,
     loanTermYears: 30, propertyValue: 800_000, depositRequired: 0.20,
-    savings: 200_000, monthlyBudget: 6_000, isFirstHomeBuyer: false,
-    propertyType: 'apartment', areaSize: 'medium', buildingAge: 'recent',
+    savings: 200_000, monthlyBudget: 6_000, wageGrowthRate: 1.5, isFirstHomeBuyer: false,
+    propertyType: 'apartment', areaSize: 'medium', buildingAge: 'recent', locationPrestige: 'norm',
     suburbArea: 'hills', enabledSpendingIds: [], customSpendings: [],
     growthRateOverride: null, currentRent: 0, renovationMonths: 0, cpiRate: 3.5,
     spendingMonths: {},
