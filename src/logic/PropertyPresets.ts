@@ -51,29 +51,47 @@ export const BUILDING_AGE_OPTIONS: OptionEntry[] = [
 
 // ─── Spending Catalogues ──────────────────────────────────────────────────────
 
+// Amounts are conservative mid-market estimates for Sydney (2024–25).
+// To adjust any figure: change the `amount` value here only. Zero tsx changes needed.
 export const UPGRADE_CATALOGUE: SpendingItem[] = [
-  { id: 'bathroom',   label: 'Bathroom Renovation', category: 'upgrade', frequency: 'once', amount: 15000, enabled: false, executionMonth: 1 },
-  { id: 'kitchen',    label: 'Kitchen Renovation',  category: 'upgrade', frequency: 'once', amount: 25000, enabled: false, executionMonth: 1 },
-  { id: 'aircon',     label: 'Aircon Replacement',  category: 'upgrade', frequency: 'once', amount: 5000,  enabled: false, executionMonth: 1 },
-  { id: 'flooring',   label: 'Flooring Upgrade',    category: 'upgrade', frequency: 'once', amount: 10000, enabled: false, executionMonth: 1 },
-  { id: 'paint',      label: 'Paint & Cosmetic',    category: 'upgrade', frequency: 'once', amount: 5000,  enabled: false, executionMonth: 1 },
-  { id: 'electrical', label: 'Electrical Rewire',   category: 'upgrade', frequency: 'once', amount: 8000,  enabled: false, executionMonth: 1 },
-  { id: 'hotwater',   label: 'Hot Water System',    category: 'upgrade', frequency: 'once', amount: 2500,  enabled: false, executionMonth: 1 },
-  { id: 'roof',       label: 'Roof Repair/Replace', category: 'upgrade', frequency: 'once', amount: 12000, enabled: false, executionMonth: 1 },
-  { id: 'deck',       label: 'Deck / Outdoor Area', category: 'upgrade', frequency: 'once', amount: 18000, enabled: false, executionMonth: 1 },
-  { id: 'landscape',  label: 'Landscaping',         category: 'upgrade', frequency: 'once', amount: 12000, enabled: false, executionMonth: 1 },
+  // Full mid-range renovation incl. tiles, fixtures, waterproofing, labour
+  { id: 'bathroom',   label: 'Bathroom Renovation', category: 'upgrade', frequency: 'once', amount: 32000, enabled: false, executionMonth: 1 },
+  // Mid-range with stone benchtops, soft-close cabinetry, appliances, labour
+  { id: 'kitchen',    label: 'Kitchen Renovation',  category: 'upgrade', frequency: 'once', amount: 48000, enabled: false, executionMonth: 1 },
+  // Good quality split system (supply + install) with contingency buffer
+  { id: 'aircon',     label: 'Aircon Replacement',  category: 'upgrade', frequency: 'once', amount: 9500,  enabled: false, executionMonth: 1 },
+  // Engineered timber or quality laminate incl. underlay, prep and installation
+  { id: 'flooring',   label: 'Flooring Upgrade',    category: 'upgrade', frequency: 'once', amount: 12000, enabled: false, executionMonth: 1 },
+  // Whole-house interior + minor patching; excludes feature walls or specialist finishes
+  { id: 'paint',      label: 'Paint & Cosmetic',    category: 'upgrade', frequency: 'once', amount: 7500,  enabled: false, executionMonth: 1 },
+  // Full rewire with switchboard upgrade; includes buffer for older homes with surprises
+  { id: 'electrical', label: 'Electrical Rewire',   category: 'upgrade', frequency: 'once', amount: 11000, enabled: false, executionMonth: 1 },
+  // Heat pump or quality storage unit, supply + install
+  { id: 'hotwater',   label: 'Hot Water System',    category: 'upgrade', frequency: 'once', amount: 3800,  enabled: false, executionMonth: 1 },
+  // Colorbond replacement on a standard single-storey home
+  { id: 'roof',       label: 'Roof Repair/Replace', category: 'upgrade', frequency: 'once', amount: 19000, enabled: false, executionMonth: 1 },
+  // 25–35m² hardwood or composite deck incl. footings, balustrade, labour
+  { id: 'deck',       label: 'Deck / Outdoor Area', category: 'upgrade', frequency: 'once', amount: 16000, enabled: false, executionMonth: 1 },
+  // Standard backyard makeover: turf, garden beds, irrigation, basic paving
+  { id: 'landscape',  label: 'Landscaping',         category: 'upgrade', frequency: 'once', amount: 15000, enabled: false, executionMonth: 1 },
 ]
 
 export const VEHICLE_CATALOGUE: SpendingItem[] = [
-  { id: 'car_purchase', label: '2nd Car Purchase',      category: 'vehicle', frequency: 'once',    amount: 25000, enabled: false, executionMonth: 1, linkedItemId: 'car_running' },
-  { id: 'car_running',  label: '2nd Car Running Costs', category: 'vehicle', frequency: 'monthly', amount: 500,   enabled: false, executionMonth: 1 },
+  // Mazda 2 / Yaris / Jazz 2018–2021 in good condition (5+ years old)
+  { id: 'car_purchase', label: '2nd Car Purchase',      category: 'vehicle', frequency: 'once',    amount: 12000, enabled: false, executionMonth: 1, linkedItemId: 'car_running' },
+  // Light use: rego, insurance, fuel, servicing — mainly metro + occasional trips
+  { id: 'car_running',  label: '2nd Car Running Costs', category: 'vehicle', frequency: 'monthly', amount: 320,   enabled: false, executionMonth: 1 },
 ]
 
 export const LIFESTYLE_CATALOGUE: SpendingItem[] = [
-  { id: 'school_primary',   label: 'Private School (Primary)',   category: 'education', frequency: 'annual', amount: 15000, enabled: false, executionMonth: 1 },
-  { id: 'school_secondary', label: 'Private School (Secondary)', category: 'education', frequency: 'annual', amount: 25000, enabled: false, executionMonth: 1 },
-  { id: 'gym',              label: 'Gym Membership',             category: 'lifestyle', frequency: 'annual', amount: 1200,  enabled: false, executionMonth: 1 },
-  { id: 'pet',              label: 'Pet Costs',                  category: 'lifestyle', frequency: 'annual', amount: 2400,  enabled: false, executionMonth: 1 },
+  // Realistic mid-tier primary school (Hills District / Shire range)
+  { id: 'school_primary',   label: 'Private School (Primary)',   category: 'education', frequency: 'annual', amount: 17000, enabled: false, executionMonth: 1 },
+  // Mid-tier Hills District secondary school incl. levies and extras
+  { id: 'school_secondary', label: 'Private School (Secondary)', category: 'education', frequency: 'annual', amount: 26000, enabled: false, executionMonth: 1 },
+  // Standard gym membership
+  { id: 'gym',              label: 'Gym Membership',             category: 'lifestyle', frequency: 'annual', amount: 1300,  enabled: false, executionMonth: 1 },
+  // Dog: food, vet, grooming, pet insurance
+  { id: 'pet',              label: 'Pet Costs (Dog)',            category: 'lifestyle', frequency: 'annual', amount: 2600,  enabled: false, executionMonth: 1 },
 ]
 
 // ─── Growth Rate Resolver ─────────────────────────────────────────────────────
