@@ -78,9 +78,10 @@ function runSimulation(params: ForecastParams, annualGrowthRate: number): { year
     const principal = Math.max(monthlyRepayment - interest, 0)
     loanBalance = Math.max(loanBalance - principal, 0)
 
-    // Annual Income Growth: compound the monthly budget each year
+    // Annual Income Growth: compound the monthly budget each year.
+    // ongoing was already debited above — do NOT subtract it again here.
     const effectiveMonthlyBudget = monthlyBudget * Math.pow(1 + wageGrowthRate / 100, yearIdx)
-    offsetBalance += effectiveMonthlyBudget - monthlyRepayment - ongoing
+    offsetBalance += effectiveMonthlyBudget - monthlyRepayment
 
     // Apply growth rate with new-build depreciation penalty for first 36 months
     let effectiveGrowthRate = monthlyGrowthRate

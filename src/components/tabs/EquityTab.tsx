@@ -32,6 +32,14 @@ function SnapshotColumn({ snap, grade }: { snap: EquitySnapshot; grade: string }
           {fmt(snap.usableEquity)}
         </span>
       </div>
+      <div className="equity-row">
+        <span className="equity-row__label">
+          Available Cash <span className="hint" title="Cash sitting in your offset account at this point.">ⓘ</span>
+        </span>
+        <span className={`equity-row__value${snap.offsetBalance < 0 ? ' equity-row__value--danger' : ' equity-row__value--accent'}`}>
+          {fmt(snap.offsetBalance)}
+        </span>
+      </div>
       <div className="equity-row equity-row--muted">
         <span className="equity-row__label">Costs Incurred</span>
         <span className="equity-row__value">−{fmt(snap.totalCostsIncurred)}</span>
