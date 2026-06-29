@@ -1,4 +1,5 @@
 import { useState, useRef, useEffect } from 'react'
+import { NavLink } from 'react-router-dom'
 import type { SavedScenario, ScenarioInputs } from '../logic/types'
 import { saveScenario, loadAllScenarios, deleteScenario, exportAsJSON, importFromJSON } from '../logic/ScenarioStorage'
 
@@ -81,6 +82,26 @@ export function HeaderToolbar({ currentInputs, onLoad }: HeaderToolbarProps) {
         <span className="toolbar__logo">📊</span>
         <h1 className="toolbar__title">Equity Chaser</h1>
       </div>
+
+      <nav className="toolbar__nav" aria-label="Main navigation">
+        <NavLink
+          to="/"
+          end
+          className={({ isActive }) =>
+            `toolbar__nav-link${isActive ? ' toolbar__nav-link--active' : ''}`
+          }
+        >
+          🏠 Dashboard
+        </NavLink>
+        <NavLink
+          to="/compare"
+          className={({ isActive }) =>
+            `toolbar__nav-link${isActive ? ' toolbar__nav-link--active' : ''}`
+          }
+        >
+          ⚖️ Compare
+        </NavLink>
+      </nav>
 
       <div className="toolbar__actions" ref={menuRef}>
         <button
