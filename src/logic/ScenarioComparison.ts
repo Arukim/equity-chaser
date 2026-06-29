@@ -29,6 +29,8 @@ export interface ComparisonPeriodSnapshot {
   netEquity: number
   /** Usable equity = (propertyValue * 0.80) - loanBalance. */
   usableEquity: number
+  /** Cash sitting in the offset account at this point. */
+  offsetBalance: number
 }
 
 /**
@@ -66,6 +68,8 @@ export interface ComputedScenarioMetrics {
   usableEquityTrajectory: number[]
   /** Total (gross) equity = propertyValue − loanBalance for each of the 120 months. */
   totalEquityTrajectory: number[]
+  /** Offset (available cash) balance for each of the 120 simulated months (index 0 = month 1). */
+  offsetTrajectory: number[]
 }
 
 /**
@@ -196,6 +200,7 @@ export function computeScenarioComparison(
 
   const usableEquityTrajectory: number[] = []
   const totalEquityTrajectory: number[] = []
+  const offsetTrajectory: number[] = []
   const snapshots: { year5?: ComparisonPeriodSnapshot; year10?: ComparisonPeriodSnapshot } = {}
 
   for (let month = 1; month <= SIMULATION_MONTHS; month++) {
@@ -231,9 +236,11 @@ export function computeScenarioComparison(
     loanBalance = Math.max(loanBalance - principal, 0)
     
 
-     // Annual Income Growth: compound the monthly budget each year
+     // Annual Income Growth: compound the monthly budget each year.
+     // Net inflow = income minus the mortgage repayment (ongoing holding costs
+     // were already debited above, so they must NOT be subtracted again here).
      const effectiveMonthlyBudget = monthlyBudget * Math.pow(1 + inputs.wageGrowthRate / 100, yearIdx)
-     offsetBalance += effectiveMonthlyBudget - monthlyRepayment - ongoing
+     offsetBalance += effectiveMonthlyBudget - monthlyRepayment
 
      // Apply growth rate with new-build depreciation penalty for first 36 months
      let effectiveGrowthRate = monthlyGrowthRate
@@ -245,6 +252,7 @@ export function computeScenarioComparison(
     const usableEquity = propValue * USABLE_EQUITY_LVR - loanBalance
     usableEquityTrajectory.push(usableEquity)
     totalEquityTrajectory.push(propValue - loanBalance + Math.max(offsetBalance, 0))
+    offsetTrajectory.push(offsetBalance)
 
     if (month === 1) {
       remainingOffsetMonth1 = offsetBalance
@@ -256,6 +264,7 @@ export function computeScenarioComparison(
         loanBalance,
         netEquity: propValue - loanBalance - totalCostsIncurred,
         usableEquity,
+        offsetBalance,
       }
       if (month === 60) snapshots.year5 = snap
       else snapshots.year10 = snap
@@ -280,6 +289,7 @@ export function computeScenarioComparison(
     totalSunkCosts,
     usableEquityTrajectory,
     totalEquityTrajectory,
+    offsetTrajectory,
   }
 }
 

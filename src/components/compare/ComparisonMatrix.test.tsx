@@ -27,11 +27,12 @@ function makeMetrics(overrides: Partial<ComputedScenarioMetrics> = {}): Computed
     propertyValue: 800_000, loanAmount: 640_000, lvr: 80, stampDuty: 30_000,
     upfrontCashRequired: 190_000, remainingOffsetMonth1: 5_000,
     monthlyCashBurn: 4_500, renovationGapMonths: 0,
-    year5: { propertyValue: 1_020_000, loanBalance: 590_000, netEquity: 280_000, usableEquity: 226_000 },
-    year10: { propertyValue: 1_300_000, loanBalance: 530_000, netEquity: 520_000, usableEquity: 510_000 },
+    year5: { propertyValue: 1_020_000, loanBalance: 590_000, netEquity: 280_000, usableEquity: 226_000, offsetBalance: 60_000 },
+    year10: { propertyValue: 1_300_000, loanBalance: 530_000, netEquity: 520_000, usableEquity: 510_000, offsetBalance: 120_000 },
     totalInterestPaid: 380_000, totalHoldingCosts: 95_000, totalSunkCosts: 475_000,
     usableEquityTrajectory: Array(120).fill(100_000) as number[],
     totalEquityTrajectory: Array(120).fill(200_000) as number[],
+    offsetTrajectory: Array(120).fill(50_000) as number[],
     ...overrides,
   }
 }
@@ -97,8 +98,8 @@ describe('ComparisonMatrix — metric row labels', () => {
 
 describe('ComparisonMatrix — winner highlighting', () => {
   it('applies winner class to higher usable equity cell at Y10', () => {
-    const mA = makeMetrics({ year10: { propertyValue: 1_200_000, loanBalance: 540_000, netEquity: 400_000, usableEquity: 420_000 } })
-    const mB = makeMetrics({ year10: { propertyValue: 1_300_000, loanBalance: 520_000, netEquity: 500_000, usableEquity: 520_000 } })
+    const mA = makeMetrics({ year10: { propertyValue: 1_200_000, loanBalance: 540_000, netEquity: 400_000, usableEquity: 420_000, offsetBalance: 100_000 } })
+    const mB = makeMetrics({ year10: { propertyValue: 1_300_000, loanBalance: 520_000, netEquity: 500_000, usableEquity: 520_000, offsetBalance: 120_000 } })
     const map = new Map([[SC_A.id, mA], [SC_B.id, mB]])
     render(<ComparisonMatrix scenarios={[SC_A, SC_B]} metricsMap={map} />)
     const badges = document.querySelectorAll('.comparison-matrix__cell-win-badge')

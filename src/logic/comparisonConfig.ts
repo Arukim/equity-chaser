@@ -142,6 +142,15 @@ export const COMPARISON_METRICS_CONFIG: MetricConfig[] = [
     isHigherBetter: true,
     format: 'currency',
   },
+  {
+    id: 'offset_balance_y5',
+    group: 'capital',
+    label: 'Available Cash 💰 — Year 5',
+    hint: 'Cash sitting in your offset account at the end of Year 5.',
+    extract: (m) => m.year5.offsetBalance,
+    isHigherBetter: true,
+    format: 'currency',
+  },
   // ── Group B: Capital Creation (Year 10) ───────────────────────────────────
   {
     id: 'prop_value_y10',
@@ -167,6 +176,15 @@ export const COMPARISON_METRICS_CONFIG: MetricConfig[] = [
     label: 'Usable Equity 🎯 — Year 10',
     hint: '(Property Value × 80%) − Loan Balance. The amount you can actually borrow against.',
     extract: (m) => m.year10.usableEquity,
+    isHigherBetter: true,
+    format: 'currency',
+  },
+  {
+    id: 'offset_balance_y10',
+    group: 'capital',
+    label: 'Available Cash 💰 — Year 10',
+    hint: 'Cash sitting in your offset account at the end of Year 10.',
+    extract: (m) => m.year10.offsetBalance,
     isHigherBetter: true,
     format: 'currency',
   },

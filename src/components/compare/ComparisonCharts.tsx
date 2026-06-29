@@ -46,7 +46,7 @@ function CustomTooltip({ active, payload, label, labelPrefix }: CustomTooltipPro
 
 // ─── Data builders ────────────────────────────────────────────────────────────
 
-function buildTrajectoryData(
+function buildOffsetData(
   scenarios: SavedScenario[],
   metricsMap: Map<string, ComputedScenarioMetrics>,
 ): Record<string, number>[] {
@@ -54,7 +54,7 @@ function buildTrajectoryData(
     const row: Record<string, number> = { month: i + 1 }
     for (const s of scenarios) {
       const m = metricsMap.get(s.id)
-      if (m) row[s.name] = m.usableEquityTrajectory[i]
+      if (m) row[s.name] = m.offsetTrajectory[i]
     }
     return row
   })
@@ -102,24 +102,23 @@ export function ComparisonCharts({ scenarios, metricsMap }: ComparisonChartsProp
     )
   }
 
-  const trajectoryData = buildTrajectoryData(scenarios, metricsMap)
+  const offsetData = buildOffsetData(scenarios, metricsMap)
   const totalEquityData = buildTotalEquityData(scenarios, metricsMap)
   const sunkData = buildSunkCostsData(scenarios, metricsMap)
 
   return (
     <div className="compare-charts">
-      {/* Chart A: Usable Equity Trajectory */}
-      <section className="compare-chart" aria-label="Usable equity trajectory over 10 years">
+      {/* Chart A: Available Cash (Offset Balance) */}
+      <section className="compare-chart" aria-label="Available cash (offset balance) over 10 years">
         <div className="compare-chart__header">
-          <h3 className="compare-chart__title">📈 Usable Equity Trajectory</h3>
+          <h3 className="compare-chart__title">💰 Available Cash</h3>
           <p className="compare-chart__subtitle">
-            Month-by-month usable equity (<em>property × 80% − loan balance</em>) over 120 months
-            using the mid-range growth rate.
+            Month-by-month cash in your offset account over 120 months.
           </p>
         </div>
         <div className="compare-chart__canvas">
           <ResponsiveContainer width="100%" height={320}>
-            <LineChart data={trajectoryData} margin={{ top: 8, right: 24, bottom: 8, left: 16 }}>
+            <LineChart data={offsetData} margin={{ top: 8, right: 24, bottom: 8, left: 16 }}>
               <CartesianGrid strokeDasharray="3 3" stroke="#2a2a38" />
               <XAxis dataKey="month" tickFormatter={monthToYearLabel} interval={11}
                 tick={{ fontSize: 11, fill: '#9ca3af' }} stroke="#3a3a48" />
