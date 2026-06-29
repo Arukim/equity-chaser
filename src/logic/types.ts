@@ -121,6 +121,12 @@ export interface ScenarioInputs {
   currentRent: number
   renovationMonths: number
   cpiRate: number
+  /**
+   * Per-item override of executionMonth for catalogue spending items.
+   * Key = SpendingItem.id, value = month number (1-based).
+   * Items not present here use their catalogue default executionMonth.
+   */
+  spendingMonths: Record<string, number>
 }
 
 /**

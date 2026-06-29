@@ -61,9 +61,11 @@ export interface ComputedScenarioMetrics {
   totalHoldingCosts: number
   totalSunkCosts: number
 
-  // ── Chart A data ─────────────────────────────────────────────────────────────
+  // ── Chart data ───────────────────────────────────────────────────────────────
   /** Usable equity for each of the 120 simulated months (index 0 = month 1). */
   usableEquityTrajectory: number[]
+  /** Total (gross) equity = propertyValue − loanBalance for each of the 120 months. */
+  totalEquityTrajectory: number[]
 }
 
 /**
@@ -86,7 +88,11 @@ function resolveSpendingItems(inputs: ScenarioInputs): SpendingItem[] {
   ]
   const enabledCatalogue = catalogue
     .filter((item) => inputs.enabledSpendingIds.includes(item.id))
-    .map((item) => ({ ...item, enabled: true }))
+    .map((item) => ({
+      ...item,
+      enabled: true,
+      executionMonth: inputs.spendingMonths[item.id] ?? item.executionMonth,
+    }))
 
   return [...presets, ...enabledCatalogue]
 }
@@ -188,6 +194,7 @@ export function computeScenarioComparison(
   let remainingOffsetMonth1 = initialOffset
 
   const usableEquityTrajectory: number[] = []
+  const totalEquityTrajectory: number[] = []
   const snapshots: { year5?: ComparisonPeriodSnapshot; year10?: ComparisonPeriodSnapshot } = {}
 
   for (let month = 1; month <= SIMULATION_MONTHS; month++) {
@@ -226,6 +233,7 @@ export function computeScenarioComparison(
 
     const usableEquity = propValue * USABLE_EQUITY_LVR - loanBalance
     usableEquityTrajectory.push(usableEquity)
+    totalEquityTrajectory.push(propValue - loanBalance + Math.max(offsetBalance, 0))
 
     if (month === 1) {
       remainingOffsetMonth1 = offsetBalance
@@ -260,6 +268,7 @@ export function computeScenarioComparison(
     totalHoldingCosts,
     totalSunkCosts,
     usableEquityTrajectory,
+    totalEquityTrajectory,
   }
 }
 

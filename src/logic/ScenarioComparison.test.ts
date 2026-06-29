@@ -26,6 +26,7 @@ const BASE_INPUTS: ScenarioInputs = {
   currentRent: 0,
   renovationMonths: 0,
   cpiRate: 3.5,
+  spendingMonths: {},
 }
 
 function derivePosition(inputs: ScenarioInputs) {
@@ -173,6 +174,49 @@ describe('renovationGapMonths', () => {
     const noReno = computeScenarioComparison(BASE_INPUTS)
     const withReno = computeScenarioComparison({ ...BASE_INPUTS, renovationMonths: 3, currentRent: 2_000 })
     expect(withReno.totalHoldingCosts).toBeGreaterThan(noReno.totalHoldingCosts)
+  })
+})
+
+// ─── Suite 8b: spendingMonths execution month override ───────────────────────
+
+describe('spendingMonths — execution month override', () => {
+  it('bathroom deferred to month 6 is excluded from upfrontCashRequired', () => {
+    // Default: bathroom executes at month 1 → included in upfront cost.
+    const defaultMonth = computeScenarioComparison({
+      ...BASE_INPUTS,
+      enabledSpendingIds: ['bathroom'],
+      spendingMonths: {},
+    })
+    // Override: defer bathroom to month 6 → NOT counted in upfront.
+    const deferred = computeScenarioComparison({
+      ...BASE_INPUTS,
+      enabledSpendingIds: ['bathroom'],
+      spendingMonths: { bathroom: 6 },
+    })
+    // The deferred scenario should have a lower upfront cash requirement.
+    expect(deferred.upfrontCashRequired).toBeLessThan(defaultMonth.upfrontCashRequired)
+  })
+
+  it('bathroom deferred to month 6 still affects offset by end of month 6', () => {
+    const defaultMonth = computeScenarioComparison({
+      ...BASE_INPUTS,
+      enabledSpendingIds: ['bathroom'],
+      spendingMonths: {},
+    })
+    const deferred = computeScenarioComparison({
+      ...BASE_INPUTS,
+      enabledSpendingIds: ['bathroom'],
+      spendingMonths: { bathroom: 6 },
+    })
+    // After 10 years both have paid the same total holding costs (renovation spend is equal).
+    // But the deferred version has better equity early on (money stayed in offset longer).
+    expect(deferred.usableEquityTrajectory[5]).toBeGreaterThan(defaultMonth.usableEquityTrajectory[5])
+  })
+
+  it('empty spendingMonths produces identical results to no override', () => {
+    const noOverride = computeScenarioComparison({ ...BASE_INPUTS, enabledSpendingIds: ['bathroom'] })
+    const emptyOverride = computeScenarioComparison({ ...BASE_INPUTS, enabledSpendingIds: ['bathroom'], spendingMonths: {} })
+    expect(noOverride.upfrontCashRequired).toBeCloseTo(emptyOverride.upfrontCashRequired, 0)
   })
 })
 

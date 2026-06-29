@@ -17,7 +17,7 @@ function makeScenario(id: string, name: string): SavedScenario {
       savings: 200_000, monthlyBudget: 6_000, isFirstHomeBuyer: false,
       propertyType: 'apartment', areaSize: 'medium', buildingAge: 'recent',
       suburbArea: 'hills', enabledSpendingIds: [], customSpendings: [],
-      growthRateOverride: 5.0, currentRent: 0, renovationMonths: 0, cpiRate: 3.5,
+      growthRateOverride: 5.0, currentRent: 0, renovationMonths: 0, cpiRate: 3.5, spendingMonths: {},
     },
   }
 }

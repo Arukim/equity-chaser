@@ -9,7 +9,10 @@ interface HeaderToolbarProps {
 }
 
 function generateId(): string {
-  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 7)}`
+  if (typeof crypto !== 'undefined' && typeof crypto.randomUUID === 'function') {
+    return crypto.randomUUID()
+  }
+  return `${Date.now().toString(36)}-${Math.random().toString(36).slice(2, 9)}`
 }
 
 export function HeaderToolbar({ currentInputs, onLoad }: HeaderToolbarProps) {
@@ -17,6 +20,7 @@ export function HeaderToolbar({ currentInputs, onLoad }: HeaderToolbarProps) {
   const [scenarios, setScenarios] = useState<SavedScenario[]>(() => loadAllScenarios())
   const [saveName, setSaveName] = useState('')
   const [showSaveInput, setShowSaveInput] = useState(false)
+  const [overwriteId, setOverwriteId] = useState<string | null>(null)
   const menuRef = useRef<HTMLDivElement>(null)
 
   // Close dropdown when clicking outside
@@ -47,6 +51,12 @@ export function HeaderToolbar({ currentInputs, onLoad }: HeaderToolbarProps) {
 
   function handleDelete(id: string) {
     deleteScenario(id)
+    refresh()
+  }
+
+  function handleUpdate(scenario: SavedScenario) {
+    saveScenario({ ...scenario, inputs: currentInputs })
+    setOverwriteId(null)
     refresh()
   }
 
@@ -144,8 +154,32 @@ export function HeaderToolbar({ currentInputs, onLoad }: HeaderToolbarProps) {
                     <span className="scenario-item__date">{new Date(s.createdAt).toLocaleDateString('en-AU')}</span>
                   </div>
                   <div className="scenario-item__actions">
-                    <button type="button" onClick={() => { onLoad(s.inputs); setOpen(false) }}>Load</button>
-                    <button type="button" onClick={() => handleDelete(s.id)}>🗑</button>
+                    {overwriteId === s.id ? (
+                      <>
+                        <span className="scenario-item__overwrite-label">Overwrite?</span>
+                        <button
+                          type="button"
+                          className="scenario-item__actions-btn--confirm"
+                          onClick={() => handleUpdate(s)}
+                        >
+                          ✓
+                        </button>
+                        <button type="button" onClick={() => setOverwriteId(null)}>✕</button>
+                      </>
+                    ) : (
+                      <>
+                        <button type="button" onClick={() => { onLoad(s.inputs); setOpen(false) }}>Load</button>
+                        <button
+                          type="button"
+                          className="scenario-item__actions-btn--update"
+                          title="Update this slot with current inputs"
+                          onClick={() => { setOverwriteId(s.id); setShowSaveInput(false) }}
+                        >
+                          ↺
+                        </button>
+                        <button type="button" onClick={() => handleDelete(s.id)}>🗑</button>
+                      </>
+                    )}
                   </div>
                 </div>
               ))}

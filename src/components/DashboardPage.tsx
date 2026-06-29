@@ -17,27 +17,32 @@ function useLS<T>(key: string, def: T): [T, (v: T | ((p: T) => T)) => void] {
   return [s, set]
 }
 
-export function DashboardPage() {
+interface DashboardPageProps {
+  onInputsChange?: (inputs: ScenarioInputs) => void
+  loaded?: { inputs: ScenarioInputs; nonce: number } | null
+}
+
+export function DashboardPage({ onInputsChange, loaded }: DashboardPageProps) {
   const [approvedLoanAmount, setApprovedLoanAmount] = useLS<number>('approvedLoanAmount', 1000000)
-  const [loanRate, setLoanRate]     = useLS<number>('loanRate', 6.05)
-  const [minLvr, setMinLvr]         = useLS<number>('minLvr', 0.95)
-  const [loanTermYears]             = useLS<number>('loanTermYears', 30)
-  const [propertyValue, setPropVal] = useLS<number>('propertyValue', 700000)
-  const [depositRequired, setDep]   = useLS<number>('depositRequired', 0.05)
-  const [isFHB, setIsFHB]           = useLS<boolean>('isFirstHomeBuyer', true)
-  const [savings, setSavings]       = useLS<number>('savings', 50000)
-  const [budget, setBudget]         = useLS<number>('monthlyBudget', 5000)
-  const [propType, setPropType]     = useLS<PropertyType>('propertyType', 'apartment')
-  const [areaSize, setAreaSize]     = useLS<AreaSize>('areaSize', 'medium')
-  const [buildAge, setBuildAge]     = useLS<BuildingAge>('buildingAge', 'recent')
-  const [suburb, setSuburb]         = useLS<SuburbArea>('suburbArea', 'hills')
-  const [enabledIds, setEnabledIds] = useLS<string[]>('enabledSpendingIds', [])
-  const [customItems]               = useLS<SpendingItem[]>('customSpendings', [])
-  const [execMonths, setExecMonths] = useLS<Record<string, number>>('spendingMonths', {})
-  const [growthOverride]            = useLS<number | null>('growthRateOverride', null)
-  const [rent, setRent]             = useLS<number>('currentRent', 0)
-  const [renoMo, setRenoMo]         = useLS<number>('renovationMonths', 0)
-  const [cpi, setCpi]               = useLS<number>('cpiRate', 3.5)
+  const [loanRate, setLoanRate]         = useLS<number>('loanRate', 6.05)
+  const [minLvr, setMinLvr]             = useLS<number>('minLvr', 0.95)
+  const [loanTermYears, setLoanTermYears] = useLS<number>('loanTermYears', 30)
+  const [propertyValue, setPropVal]     = useLS<number>('propertyValue', 700000)
+  const [depositRequired, setDep]       = useLS<number>('depositRequired', 0.05)
+  const [isFHB, setIsFHB]               = useLS<boolean>('isFirstHomeBuyer', true)
+  const [savings, setSavings]           = useLS<number>('savings', 50000)
+  const [budget, setBudget]             = useLS<number>('monthlyBudget', 5000)
+  const [propType, setPropType]         = useLS<PropertyType>('propertyType', 'apartment')
+  const [areaSize, setAreaSize]         = useLS<AreaSize>('areaSize', 'medium')
+  const [buildAge, setBuildAge]         = useLS<BuildingAge>('buildingAge', 'recent')
+  const [suburb, setSuburb]             = useLS<SuburbArea>('suburbArea', 'hills')
+  const [enabledIds, setEnabledIds]     = useLS<string[]>('enabledSpendingIds', [])
+  const [customItems, setCustomItems]   = useLS<SpendingItem[]>('customSpendings', [])
+  const [execMonths, setExecMonths]     = useLS<Record<string, number>>('spendingMonths', {})
+  const [growthOverride, setGrowthOverride] = useLS<number | null>('growthRateOverride', null)
+  const [rent, setRent]                 = useLS<number>('currentRent', 0)
+  const [renoMo, setRenoMo]             = useLS<number>('renovationMonths', 0)
+  const [cpi, setCpi]                   = useLS<number>('cpiRate', 3.5)
 
   const stampDuty  = useMemo(() => calculateNSWStampDuty(propertyValue, isFHB), [propertyValue, isFHB])
   const loan       = useMemo(() => Math.min(propertyValue * minLvr, propertyValue * (1 - depositRequired)), [propertyValue, minLvr, depositRequired])
@@ -120,7 +125,46 @@ export function DashboardPage() {
     areaSize, buildingAge: buildAge, suburbArea: suburb, enabledSpendingIds: enabledIds,
     customSpendings: customItems, growthRateOverride: growthOverride,
     currentRent: rent, renovationMonths: renoMo, cpiRate: cpi,
+    spendingMonths: execMonths,
   }
+
+  // Push the live inputs snapshot up to App so HeaderToolbar always saves the real form state.
+  // Depend on every individual primitive so this only fires when something actually changed.
+  useEffect(() => {
+    onInputsChange?.(inputs)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [
+    approvedLoanAmount, loanRate, minLvr, loanTermYears, propertyValue, depositRequired,
+    savings, budget, isFHB, propType, areaSize, buildAge, suburb,
+    enabledIds, customItems, execMonths, growthOverride, rent, renoMo, cpi,
+  ])
+
+  // When a scenario is loaded (nonce changes), apply all its field values.
+  useEffect(() => {
+    if (!loaded) return
+    const i = loaded.inputs
+    setApprovedLoanAmount(i.approvedLoanAmount)
+    setLoanRate(i.loanRate)
+    setMinLvr(i.minLvr)
+    setLoanTermYears(i.loanTermYears)
+    setPropVal(i.propertyValue)
+    setDep(i.depositRequired)
+    setIsFHB(i.isFirstHomeBuyer)
+    setSavings(i.savings)
+    setBudget(i.monthlyBudget)
+    setPropType(i.propertyType)
+    setAreaSize(i.areaSize)
+    setBuildAge(i.buildingAge)
+    setSuburb(i.suburbArea)
+    setEnabledIds(i.enabledSpendingIds)
+    setCustomItems(i.customSpendings)
+    setExecMonths(i.spendingMonths ?? {})
+    setGrowthOverride(i.growthRateOverride)
+    setRent(i.currentRent)
+    setRenoMo(i.renovationMonths)
+    setCpi(i.cpiRate)
+  // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [loaded?.nonce])
 
   return (
     <div className="dashboard">

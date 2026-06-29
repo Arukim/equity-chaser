@@ -60,6 +60,20 @@ function buildTrajectoryData(
   })
 }
 
+function buildTotalEquityData(
+  scenarios: SavedScenario[],
+  metricsMap: Map<string, ComputedScenarioMetrics>,
+): Record<string, number>[] {
+  return Array.from({ length: COMPARISON_SIMULATION_MONTHS }, (_, i) => {
+    const row: Record<string, number> = { month: i + 1 }
+    for (const s of scenarios) {
+      const m = metricsMap.get(s.id)
+      if (m) row[s.name] = m.totalEquityTrajectory[i]
+    }
+    return row
+  })
+}
+
 function buildSunkCostsData(
   scenarios: SavedScenario[],
   metricsMap: Map<string, ComputedScenarioMetrics>,
@@ -89,6 +103,7 @@ export function ComparisonCharts({ scenarios, metricsMap }: ComparisonChartsProp
   }
 
   const trajectoryData = buildTrajectoryData(scenarios, metricsMap)
+  const totalEquityData = buildTotalEquityData(scenarios, metricsMap)
   const sunkData = buildSunkCostsData(scenarios, metricsMap)
 
   return (
@@ -123,7 +138,37 @@ export function ComparisonCharts({ scenarios, metricsMap }: ComparisonChartsProp
         </div>
       </section>
 
-      {/* Chart B: Sunk Costs Breakdown */}
+      {/* Chart B: Total Equity Trajectory */}
+      <section className="compare-chart" aria-label="Total net wealth trajectory over 10 years">
+        <div className="compare-chart__header">
+          <h3 className="compare-chart__title">🏠 Total Net Wealth Trajectory</h3>
+          <p className="compare-chart__subtitle">
+            Month-by-month true net wealth (<em>property value − loan balance + offset balance</em>) over 120 months
+            using the mid-range growth rate.
+          </p>
+        </div>
+        <div className="compare-chart__canvas">
+          <ResponsiveContainer width="100%" height={320}>
+            <LineChart data={totalEquityData} margin={{ top: 8, right: 24, bottom: 8, left: 16 }}>
+              <CartesianGrid strokeDasharray="3 3" stroke="#2a2a38" />
+              <XAxis dataKey="month" tickFormatter={monthToYearLabel} interval={11}
+                tick={{ fontSize: 11, fill: '#9ca3af' }} stroke="#3a3a48" />
+              <YAxis tickFormatter={fmtYAxis} tick={{ fontSize: 11, fill: '#9ca3af' }}
+                stroke="#3a3a48" width={72} />
+              <ReferenceLine y={0} stroke="#6b7280" strokeDasharray="4 4" label={{ value: '$0', fill: '#6b7280', fontSize: 10 }} />
+              <Tooltip content={<CustomTooltip labelPrefix="Month " />} />
+              <Legend wrapperStyle={{ fontSize: '0.82rem', paddingTop: '8px' }} iconType="circle" />
+              {scenarios.map((s, idx) => (
+                <Line key={s.id} type="monotone" dataKey={s.name}
+                  stroke={SCENARIO_COLOURS[idx % SCENARIO_COLOURS.length]}
+                  strokeWidth={2} dot={false} activeDot={{ r: 5 }} />
+              ))}
+            </LineChart>
+          </ResponsiveContainer>
+        </div>
+      </section>
+
+      {/* Chart C: Sunk Costs Breakdown */}
       <section className="compare-chart" aria-label="10-year sunk costs breakdown">
         <div className="compare-chart__header">
           <h3 className="compare-chart__title">🔥 Sunk Costs Breakdown — Year 10</h3>

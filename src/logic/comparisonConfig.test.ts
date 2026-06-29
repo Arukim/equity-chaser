@@ -29,6 +29,7 @@ const FIXTURE_INPUTS: ScenarioInputs = {
   currentRent: 0,
   renovationMonths: 0,
   cpiRate: 3.5,
+  spendingMonths: {},
 }
 
 const FIXTURE_METRICS = computeScenarioComparison(FIXTURE_INPUTS)

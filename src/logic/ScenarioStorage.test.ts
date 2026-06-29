@@ -25,6 +25,7 @@ const INPUTS: ScenarioInputs = {
   propertyType: 'apartment', areaSize: 'medium', buildingAge: 'recent',
   suburbArea: 'hills', enabledSpendingIds: [], customSpendings: [],
   growthRateOverride: null, currentRent: 0, renovationMonths: 0, cpiRate: 3.5,
+  spendingMonths: {},
 }
 
 function makeScenario(id: string, name: string): SavedScenario {
@@ -142,6 +143,37 @@ describe('schema migration', () => {
     expect(loaded[0].inputs.currentRent).toBe(0)
     expect(loaded[0].inputs.renovationMonths).toBe(0)
     expect(loaded[0].inputs.isFirstHomeBuyer).toBe(false)
+    expect(loaded[0].inputs.spendingMonths).toEqual({})
+  })
+
+  it('legacy scenario missing spendingMonths is migrated to empty object', () => {
+    const legacy = {
+      id: 'legacy2', name: 'Legacy No Months',
+      createdAt: new Date().toISOString(),
+      inputs: {
+        approvedLoanAmount: 800000, loanRate: 6.0, minLvr: 0.9,
+        loanTermYears: 30, propertyValue: 600000, depositRequired: 0.1,
+        savings: 40000, monthlyBudget: 4000,
+        propertyType: 'house', areaSize: 'large', buildingAge: 'mid',
+        suburbArea: 'shire', enabledSpendingIds: [], customSpendings: [],
+        growthRateOverride: null, currentRent: 0, renovationMonths: 0, cpiRate: 3.5,
+        // spendingMonths intentionally absent
+      },
+    }
+    localStorage.setItem('equity-chaser:scenarios', JSON.stringify([legacy]))
+    const loaded = loadAllScenarios()
+    expect(loaded).toHaveLength(1)
+    expect(loaded[0].inputs.spendingMonths).toEqual({})
+  })
+
+  it('scenario saved with spendingMonths round-trips correctly', () => {
+    const withMonths = {
+      ...INPUTS,
+      spendingMonths: { bathroom: 6, car_purchase: 12 },
+    }
+    saveScenario({ schemaVersion: 1, id: 'months1', name: 'With Months', createdAt: new Date().toISOString(), inputs: withMonths })
+    const loaded = loadAllScenarios()
+    expect(loaded[0].inputs.spendingMonths).toEqual({ bathroom: 6, car_purchase: 12 })
   })
 
   it('corrupt localStorage entry does not crash — returns empty array', () => {
